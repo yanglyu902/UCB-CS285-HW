@@ -11,7 +11,7 @@ MJ_ENV_KWARGS["Ant-v4"]["use_contact_forces"] = True
 def sample_trajectory(env, policy, max_path_length, render=False):
 
     # initialize env for the beginning of a new rollout
-    ob = TODO # HINT: should be the output of resetting the env
+    ob = env.reset() # TODO: # HINT: should be the output of resetting the env
 
     # init vars
     obs, acs, rewards, next_obs, terminals, image_obs = [], [], [], [], [], []
@@ -27,7 +27,7 @@ def sample_trajectory(env, policy, max_path_length, render=False):
 
         # use the most recent ob to decide what to do
         obs.append(ob)
-        ac = TODO # HINT: query the policy's get_action function
+        ac = policy.get_action() # TODO: # HINT: query the policy's get_action function
         ac = ac[0]
         acs.append(ac)
 
@@ -39,9 +39,9 @@ def sample_trajectory(env, policy, max_path_length, render=False):
         next_obs.append(ob)
         rewards.append(rew)
 
-        # TODO end the rollout if the rollout ended
+        # TODO: end the rollout if the rollout ended
         # HINT: rollout can end due to done, or due to max_path_length
-        rollout_done = TODO # HINT: this is either 0 or 1
+        rollout_done = (steps >= max_path_length).astype(int) # TODO: # HINT: this is either 0 or 1
         terminals.append(rollout_done)
 
         if rollout_done:
@@ -53,15 +53,17 @@ def sample_trajectories(env, policy, min_timesteps_per_batch, max_path_length, r
     """
         Collect rollouts until we have collected min_timesteps_per_batch steps.
 
-        TODO implement this function
+        TODO: implement this function
         Hint1: use sample_trajectory to get each path (i.e. rollout) that goes into paths
         Hint2: use get_pathlength to count the timesteps collected in each path
     """
     timesteps_this_batch = 0
     paths = []
+    
     while timesteps_this_batch < min_timesteps_per_batch:
-
-        TODO
+        curr_path = sample_trajectory(env, policy, max_path_length, render)
+        paths.append(curr_path)
+        timesteps_this_batch += get_pathlength(curr_path)
 
     return paths, timesteps_this_batch
 
@@ -69,12 +71,15 @@ def sample_n_trajectories(env, policy, ntraj, max_path_length, render=False):
     """
         Collect ntraj rollouts.
 
-        TODO implement this function
+        TODO: implement this function
         Hint1: use sample_trajectory to get each path (i.e. rollout) that goes into paths
     """
     paths = []
 
-    TODO
+    # TODO:
+    for _ in range(ntraj):
+        curr_path = sample_trajectory(env, policy, max_path_length, render)
+        paths.append(curr_path)
 
     return paths
 
