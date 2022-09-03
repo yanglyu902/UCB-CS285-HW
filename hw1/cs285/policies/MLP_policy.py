@@ -100,7 +100,8 @@ class MLPPolicy(BasePolicy, nn.Module, metaclass=abc.ABCMeta):
             action = self.logits_na.forward(observation)
         else:
             action = self.mean_net.forward(observation)
-        return torch.FloatTensor(action)
+
+        return action
 
 
 #####################################################
@@ -118,8 +119,9 @@ class MLPPolicySL(MLPPolicy):
         # TODO: update the policy and return the loss
 
         self.optimizer.zero_grad()
-        my_action = self.forward(torch.FloatTensor(observations, device=ptu.device))
-        loss = self.loss(my_action, torch.FloatTensor(actions, device=ptu.device)) # TODO:
+        my_action = self.get_action(observations)
+        # loss = self.loss(my_action, torch.FloatTensor(actions, device=ptu.device)) # TODO:
+        loss = self.loss(my_action, torch.tensor(actions, device=ptu.device))
         loss.backward()
         self.optimizer.step()
 

@@ -51,7 +51,7 @@ def build_mlp(
     layers = []
     layers.append(nn.Linear(input_size, size))
     layers.append(activation)
-    for i in range(size):
+    for i in range(n_layers):
         layers.append(nn.Linear(size, size))
         layers.append(activation)
     layers.append(nn.Linear(size, output_size))
@@ -71,7 +71,7 @@ def init_gpu(use_gpu=True, gpu_id=0):
         device = torch.device("cuda:" + str(gpu_id))
         print("Using GPU id {}".format(gpu_id))
     elif use_gpu:
-        device = torch.device("cpu") # FIXME: mps
+        device = torch.device("mps") # FIXME: mps
         print("CUDA not detected. Defaulting to MPS.")
     else:
         device = torch.device("cpu")
