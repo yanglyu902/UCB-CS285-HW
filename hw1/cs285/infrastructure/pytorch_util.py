@@ -71,7 +71,7 @@ def init_gpu(use_gpu=True, gpu_id=0):
         device = torch.device("cuda:" + str(gpu_id))
         print("Using GPU id {}".format(gpu_id))
     elif use_gpu:
-        device = torch.device("mps")
+        device = torch.device("cpu") # FIXME: mps
         print("CUDA not detected. Defaulting to MPS.")
     else:
         device = torch.device("cpu")

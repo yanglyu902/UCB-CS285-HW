@@ -4,6 +4,7 @@ import time
 
 import gym
 import torch
+import pickle 
 
 from cs285.infrastructure import pytorch_util as ptu
 from cs285.infrastructure.logger import Logger
@@ -170,7 +171,16 @@ class RL_Trainer(object):
         print("\nCollecting data to be used for training...")        
 
         if itr == 0:
-            return load_initial_expertdata, 0, None
+            with open(load_initial_expertdata, 'rb') as f:
+                data = pickle.loads(f.read())[1]
+                path = utils.Path(
+                    list(data['observation']), 
+                    list(data['image_obs']), 
+                    list(data['action']), 
+                    list(data['reward']), 
+                    list(data['next_observation']), 
+                    list(data['terminal']))
+            return [path], 0, None
         else:
             paths, envsteps_this_batch = utils.sample_trajectories(self.env, collect_policy, batch_size, self.params['ep_len'])
 
