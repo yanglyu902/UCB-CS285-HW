@@ -117,9 +117,11 @@ class MLPPolicySL(MLPPolicy):
     ):
         # TODO: update the policy and return the loss
 
+        self.optimizer.zero_grad()
         my_action = self.forward(torch.FloatTensor(observations, device=ptu.device))
-
         loss = self.loss(my_action, torch.FloatTensor(actions, device=ptu.device)) # TODO:
+        loss.backward()
+        self.optimizer.step()
 
         return {
             # You can add extra logging information here, but keep this line

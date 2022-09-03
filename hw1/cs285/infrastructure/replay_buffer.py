@@ -79,6 +79,7 @@ class ReplayBuffer(object):
 
         idx = np.random.permutation(self.obs.shape[0])
         idx_sel = idx[:batch_size]
+
         return (
             self.obs[idx_sel],
             self.acs[idx_sel],

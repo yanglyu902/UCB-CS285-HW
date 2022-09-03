@@ -221,7 +221,7 @@ class RL_Trainer(object):
 
         for i in range(len(paths)):
             obs = paths[i]['observation']
-            paths[i]['action'] = expert_policy.get_action(obs)[0]
+            paths[i]['action'] = expert_policy.get_action(obs)
 
         return paths
 
