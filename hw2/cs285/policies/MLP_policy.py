@@ -132,7 +132,7 @@ class MLPPolicyPG(MLPPolicy):
         self.baseline_loss = nn.MSELoss()
 
     def update(self, observations, actions, advantages, q_values=None):
-        observations = ptu.from_numpy(observations)
+        # observations = ptu.from_numpy(observations)
         actions = ptu.from_numpy(actions)
         advantages = ptu.from_numpy(advantages)
         
@@ -145,9 +145,9 @@ class MLPPolicyPG(MLPPolicy):
         # HINT2: you will want to use the `log_prob` method on the distribution returned
             # by the `forward` method
 
-        action_distribution = self.forward(observations)
+        action_distribution = self.forward(ptu.from_numpy(observations))
         log_prob = action_distribution.log_prob(actions)
-        loss = -torch.mean(log_prob * advantages)
+        loss = -torch.sum(log_prob * advantages) # DEBUG: mean or sum??
         self.optimizer.zero_grad()
         loss.backward()
         self.optimizer.step()
@@ -159,11 +159,12 @@ class MLPPolicyPG(MLPPolicy):
 
             ## Note: You will need to convert the targets into a tensor using
                 ## ptu.from_numpy before using it in the loss
-            
+
             q_values = (q_values - np.mean(q_values)) / np.std(q_values)
             q_values = ptu.from_numpy(q_values)
             baseline_prediction = self.run_baseline_prediction(observations)
-            baseline_loss = self.baseline_loss(baseline_prediction, q_values)
+
+            baseline_loss = torch.tensor(self.baseline_loss(ptu.from_numpy(baseline_prediction), q_values), requires_grad=True)
             self.baseline_optimizer.zero_grad()
             baseline_loss.backward()
             self.baseline_optimizer.step()

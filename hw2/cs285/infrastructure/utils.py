@@ -71,7 +71,7 @@ def sample_trajectory(env, policy, max_path_length, render=False, render_mode=('
         ac = ac[0]
         acs.append(ac)
 
-        ob, rew, done, _ = env.step(ac) # DEBUG: too many values to unpack
+        ob, rew, done, _ = env.step(ac)
         # add the observation after taking a step to next_obs
         next_obs.append(ob)
         rewards.append(rew)

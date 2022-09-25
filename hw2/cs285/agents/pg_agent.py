@@ -46,7 +46,7 @@ class PGAgent(BaseAgent):
         q_vals = np.concatenate(self.calculate_q_vals(rewards_list)).ravel()
         advantages = self.estimate_advantage(observations, rewards_list, q_vals, terminals)
 
-        train_log = self.actor.update(observations, actions, advantages)
+        train_log = self.actor.update(observations, actions, advantages, q_vals)
 
         return train_log
 
@@ -73,17 +73,17 @@ class PGAgent(BaseAgent):
         # dimension corresponds to trajectories and the second corresponds
         # to timesteps
 
+        q_values = []
+
         if not self.reward_to_go:
-            q_values = []
-            for i in range(len(rewards_list)):
-                q_values.append(self._discounted_return(rewards_list[i]))
+            for r_list in rewards_list:
+                q_values.append(self._discounted_return(r_list))
 
         # Case 2: reward-to-go PG
         # Estimate Q^{pi}(s_t, a_t) by the discounted sum of rewards starting from t
         else:
-            q_values = []
-            for i in range(len(rewards_list)):
-                q_values.append(self._discounted_cumsum(rewards_list[i]))
+            for r_list in rewards_list:
+                q_values.append(self._discounted_cumsum(r_list))
 
         return q_values
 
@@ -104,7 +104,7 @@ class PGAgent(BaseAgent):
                 ## that the predictions have the same mean and standard deviation as
                 ## the current batch of q_values
             
-            values = values * np.std(q_values) + np.mean(q_values)
+            values = values_unnormalized * np.std(q_values) + np.mean(q_values)
 
             if self.gae_lambda is not None:
                 ## append a dummy T+1 value for simpler recursive calculation
@@ -167,7 +167,7 @@ class PGAgent(BaseAgent):
         # print('myown: shape of rewards:',  rewards.shape)
         gammas = self.gamma ** np.arange(len(rewards))
         total = np.sum(gammas * rewards)
-        list_of_discounted_returns = [total for i in range(len(rewards))]
+        list_of_discounted_returns = [total for _ in range(len(rewards))]
         return list_of_discounted_returns
 
     def _discounted_cumsum(self, rewards):
