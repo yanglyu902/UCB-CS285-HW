@@ -50,7 +50,9 @@ class RL_Trainer(object):
         else:
             render_mode = 'rgb_array'
         self.env = gym.make(self.params['env_name'], render_mode=render_mode)
-        self.env.seed(seed)
+        self.env.seed(seed) # DEBUG: ???
+        # self.env.reset(seed=seed)
+
 
         # Add noise wrapper
         if params['action_noise_std'] > 0:
@@ -173,7 +175,8 @@ class RL_Trainer(object):
             self.env, collect_policy, num_transitions_to_sample, self.params['ep_len'])
 
         train_video_paths = None
-        if self.log_video:
+        # if self.log_video: # DEBUG:??
+        if self.logvideo:
             print('\nCollecting train rollouts to be used for saving videos...')
             train_video_paths = utils.sample_n_trajectories(self.env, collect_policy, MAX_NVIDEO, MAX_VIDEO_LEN, True)
 

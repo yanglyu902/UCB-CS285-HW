@@ -87,7 +87,6 @@ class MLPPolicy(BasePolicy, nn.Module, metaclass=abc.ABCMeta):
     # query the policy with observation(s) to get selected action(s)
     def get_action(self, obs: np.ndarray) -> np.ndarray:
         # TODO: get this from HW1
-
         if len(obs.shape) > 1:
             observation = obs
         else:
@@ -136,6 +135,8 @@ class MLPPolicyPG(MLPPolicy):
         observations = ptu.from_numpy(observations)
         actions = ptu.from_numpy(actions)
         advantages = ptu.from_numpy(advantages)
+        
+        # print(observations.shape, actions.shape, advantages.shape)
 
         # TODO: update the policy using policy gradient
         # HINT1: Recall that the expression that we want to MAXIMIZE
@@ -144,7 +145,12 @@ class MLPPolicyPG(MLPPolicy):
         # HINT2: you will want to use the `log_prob` method on the distribution returned
             # by the `forward` method
 
-        TODO
+        action_distribution = self.forward(observations)
+        log_prob = action_distribution.log_prob(actions)
+        loss = -torch.mean(log_prob * advantages)
+        self.optimizer.zero_grad()
+        loss.backward()
+        self.optimizer.step()
 
         if self.nn_baseline:
             ## TODO: update the neural network baseline using the q_values as
@@ -153,8 +159,14 @@ class MLPPolicyPG(MLPPolicy):
 
             ## Note: You will need to convert the targets into a tensor using
                 ## ptu.from_numpy before using it in the loss
-
-            TODO
+            
+            q_values = (q_values - np.mean(q_values)) / np.std(q_values)
+            q_values = ptu.from_numpy(q_values)
+            baseline_prediction = self.run_baseline_prediction(observations)
+            baseline_loss = self.baseline_loss(baseline_prediction, q_values)
+            self.baseline_optimizer.zero_grad()
+            baseline_loss.backward()
+            self.baseline_optimizer.step()
 
         train_log = {
             'Training Loss': ptu.to_numpy(loss),
