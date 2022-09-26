@@ -147,7 +147,7 @@ class MLPPolicyPG(MLPPolicy):
 
         action_distribution = self.forward(ptu.from_numpy(observations))
         log_prob = action_distribution.log_prob(actions)
-        loss = -torch.sum(log_prob * advantages) # DEBUG: mean or sum??
+        loss = -torch.mean(log_prob * advantages) # DEBUG: mean or sum??
         self.optimizer.zero_grad()
         loss.backward()
         self.optimizer.step()

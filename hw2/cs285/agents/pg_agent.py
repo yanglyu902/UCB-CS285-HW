@@ -124,7 +124,13 @@ class PGAgent(BaseAgent):
                     ## HINT: use terminals to handle edge cases. terminals[i]
                         ## is 1 if the state is the last in its trajectory, and
                         ## 0 otherwise.
-                    pass
+                    
+                    if terminals[i]==1:
+                        advantages[i] = rews[i] - values[i]
+                    else:
+                        delta_t = rews[i] + self.gamma*values[i+1] - values[i]
+                        advantages[i] = delta_t + self.gamma*self.gae_lambda*advantages[i+1]
+
                 # remove dummy advantage
                 advantages = advantages[:-1]
 
@@ -139,7 +145,7 @@ class PGAgent(BaseAgent):
         # Normalize the resulting advantages to have a mean of zero
         # and a standard deviation of one
         if self.standardize_advantages:
-            advantages = (advantages - np.mean(advantages)) / np.std(advantages)
+            advantages = (advantages - np.mean(advantages)) / (np.std(advantages) + 1e-9)
 
         return advantages
 
@@ -176,7 +182,8 @@ class PGAgent(BaseAgent):
             -takes a list of rewards {r_0, r_1, ..., r_t', ... r_T},
             -and returns a list where the entry in each index t' is sum_{t'=t}^T gamma^(t'-t) * r_{t'}
         """
-
-        gammas = self.gamma ** np.arange(len(rewards))
-        list_of_discounted_cumsums = [np.sum(gammas[i:] * rewards[i:]) for i in range(len(rewards))]
+        # DEBUG: sth is wrong here
+        T = len(rewards)
+        gammas = self.gamma ** np.arange(T) # [1, gamma, gamma^2, ..., gamma^(T-1)]
+        list_of_discounted_cumsums = [np.sum(gammas[:T-i] * rewards[i:]) for i in range(T)]
         return list_of_discounted_cumsums
