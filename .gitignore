@@ -1,7 +1,7 @@
 # myown
 **/data
 **/.DS_Store
-
+**/submit
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
